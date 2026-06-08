@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>足球联赛积分榜 · 可编辑版</title>
+    <style>
+        :root {
+            --bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border: #e8e8e8;
+            --border-light: #f0f0f0;
+            --accent: #c62828;
+            --accent-light: #e53935;
+            --accent-bg: #fef5f5;
+            --gold: #d4a017;
+            --gold-bg: #fffdf5;
+            --blue: #1a6fb5;
+            --blue-bg: #f5faff;
+            --red-zone: #e53935;
+            --red-zone-bg: #fff5f5;
+            --orange-zone: #e67e22;
+            --orange-zone-bg: #fffdf8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+            --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: #eef1f5;
+            min-height: 100vh;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .header {
+            background: var(--accent);
+            color: #fff;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(198, 40, 40, 0.25);
+        }
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-title .icon-ball {
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--accent);
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            outline: none;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: #fff;
+            color: var(--accent);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+        .btn-primary:hover {
+            background: #fefefe;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+            transform: translateY(-1px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            border: 1.5px solid rgba(255, 255, 255, 0.6);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #fff;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.78rem;
+            border-radius: 14px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+        .btn-danger-sm {
+            background: transparent;
+            color: #d32f2f;
+            border: 1px solid #f5c6cb;
+            cursor: pointer;
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .btn-danger-sm:hover {
+            background: #fff5f5;
+            border-color: #d32f2f;
+            color: #b71c1c;
+        }
+
+        .main-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .toolbar-info {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .toolbar-info .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-gold { background: var(--gold); }
+        .dot-blue { background: var(--blue); }
+        .dot-red { background: var(--red-zone); }
+        .dot-orange { background: var(--orange-zone); }
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-left: 6px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        .table-wrapper::-webkit-scrollbar { height: 5px; }
+        .table-wrapper::-webkit-scrollbar-track { background: transparent; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 10px; }
+        .table-wrapper::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+            table-layout: auto;
+        }
+        .standings-table thead th {
+            background: #fafbfc;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 8px;
+            border-bottom: 2px solid #e8e8e8;
+            white-space: nowrap;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .standings-table thead th.col-rank { width: 50px; }
+        .standings-table thead th.col-team { text-align: left; padding-left: 16px; min-width: 180px; }
+        .standings-table thead th.col-num { width: 60px; }
+        .standings-table thead th.col-gd { width: 70px; }
+        .standings-table thead th.col-pts { width: 60px; color: var(--accent); font-weight: 700; }
+        .standings-table tbody tr {
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px solid var(--border-light);
+        }
+        .standings-table tbody tr:hover { background: #fafcfd; }
+        .standings-table tbody tr.row-gold { background: var(--gold-bg); }
+        .standings-table tbody tr.row-gold:hover { background: #fffbe8; }
+        .standings-table tbody tr.row-blue { background: var(--blue-bg); }
+        .standings-table tbody tr.row-blue:hover { background: #edf6fc; }
+        .standings-table tbody tr.row-orange { background: var(--orange-zone-bg); }
+        .standings-table tbody tr.row-orange:hover { background: #fffaf3; }
+        .standings-table tbody tr.row-red { background: var(--red-zone-bg); }
+        .standings-table tbody tr.row-red:hover { background: #fff0f0; }
+        .standings-table tbody td {
+            padding: 10px 6px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+            font-size: 0.9rem;
+        }
+        .standings-table tbody td.col-rank {
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: center;
+        }
+        .rank-gold { color: var(--gold); font-size: 1.2rem !important; }
+        .rank-blue { color: var(--blue); }
+        .rank-red { color: var(--red-zone); }
+        .rank-orange { color: var(--orange-zone); }
+        .standings-table tbody td.col-team-cell { text-align: left; padding-left: 12px; }
+        .team-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .team-logo-img {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            object-fit: contain;
+            border: 2px solid #eee;
+            background: #fafafa;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .team-logo-img:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(198,40,40,0.08);
+        }
+        .team-logo-placeholder {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1.5px dashed #d0d0d0;
+            background: #fafafa;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #bbb;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+        .team-logo-placeholder:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: #fff;
+            border-style: solid;
+        }
+        .team-name-input {
+            border: 1px solid transparent;
+            background: transparent;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            width: 110px;
+            transition: var(--transition);
+            color: var(--text);
+            font-family: inherit;
+        }
+        .team-name-input:hover { border-color: #ddd; }
+        .team-name-input:focus {
+            border-color: var(--accent);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(198,40,40,0.06);
+            width: 140px;
+        }
+
+        .data-input {
+            width: 52px;
+            text-align: center;
+            border: 1px solid transparent;
+            background: transparent;
+            font-size: 0.9rem;
+            padding: 6px 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+            color: var(--text);
+            font-family: inherit;
+            font-variant-numeric: tabular-nums;
+            -moz-appearance: textfield;
+        }
+        .data-input::-webkit-outer-spin-button,
+        .data-input::-webkit-inner-spin-button { opacity: 0; height: 20px; }
+        .data-input:hover { border-color: #ddd; background: #fafafa; }
+        .data-input:focus {
+            border-color: var(--accent);
+            outline: none;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(198,40,40,0.06);
+            z-index: 1;
+            position: relative;
+        }
+        .data-input.calculated {
+            font-weight: 600;
+            color: #555;
+            cursor: default;
+            background: #f9f9f9;
+            border-color: transparent;
+            pointer-events: none;
+            user-select: none;
+        }
+        .col-pts .data-input {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--accent);
+            width: 48px;
+        }
+        .col-gd .data-input { font-weight: 600; color: #444; }
+
+        .col-action { width: 40px; }
+        .delete-btn { opacity: 0; transition: opacity 0.2s; }
+        .standings-table tbody tr:hover .delete-btn { opacity: 1; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state .icon-large { font-size: 4rem; margin-bottom: 16px; opacity: 0.6; }
+        .empty-state p { font-size: 1rem; margin-bottom: 20px; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 28px 24px 20px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .modal h3 { font-size: 1.15rem; margin-bottom: 20px; color: var(--text); text-align: center; }
+        .modal .form-group { margin-bottom: 16px; }
+        .modal label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+        .modal input[type="text"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            font-family: inherit;
+            outline: none;
+        }
+        .modal input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(198,40,40,0.06);
+        }
+        .modal .logo-upload-area { display: flex; align-items: center; gap: 14px; }
+        .modal .logo-preview {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 2px dashed #d0d0d0;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; background: #fafafa; flex-shrink: 0; cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal .logo-preview:hover { border-color: var(--accent); border-style: solid; }
+        .modal .logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+        .modal .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-cancel { background: #f0f0f0; color: #555; }
+        .btn-cancel:hover { background: #e5e5e5; }
+        .btn-confirm { background: var(--accent); color: #fff; }
+        .btn-confirm:hover { background: #b71c1c; }
+
+        .toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #fff; padding: 12px 24px; border-radius: 24px;
+            font-size: 0.9rem; z-index: 300;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 1.8s forwards;
+            pointer-events: none; white-space: nowrap; font-weight: 500;
+        }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(20px); } }
+
+        @media (max-width: 768px) {
+            .header { padding: 0 12px; height: 48px; }
+            .header-title { font-size: 1rem; }
+            .btn { padding: 7px 14px; font-size: 0.8rem; }
+            .standings-table { min-width: 750px; }
+            .standings-table thead th, .standings-table tbody td { padding: 8px 4px; font-size: 0.78rem; }
+            .data-input { width: 40px; font-size: 0.78rem; }
+            .team-logo-img, .team-logo-placeholder { width: 26px; height: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-title">
+        <span class="icon-ball">⚽</span>
+        <span>联赛积分榜</span>
+    </div>
+    <div class="header-actions">
+        <button class="btn btn-outline btn-sm" onclick="resetAllData()">🔄 重置</button>
+        <button class="btn btn-primary" onclick="openAddModal()">+ 添加球队</button>
+    </div>
+</header>
+
+<div class="main-container">
+    <div class="card">
+        <div class="toolbar">
+            <div class="toolbar-info">
+                <span>共 <strong id="teamCount">0</strong> 支球队</span>
+                <span style="margin-left:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <span class="legend-item"><span class="dot dot-gold"></span> 冠军</span>
+                    <span class="legend-item"><span class="dot dot-blue"></span> 世外冠</span>
+                    <span class="legend-item"><span class="dot dot-orange"></span> 降级边缘</span>
+                    <span class="legend-item"><span class="dot dot-red"></span> 降级区</span>
+                </span>
+            </div>
+            <span style="font-size:0.75rem;color:#999;">💡 点击数字编辑 | 队徽可上传 | 场次/净胜球支持手动修改</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="standings-table" id="standingsTable">
+                <thead>
+                    <tr>
+                        <th class="col-rank">#</th>
+                        <th class="col-team">球队</th>
+                        <th class="col-num">场次</th>
+                        <th class="col-num">胜</th>
+                        <th class="col-num">平</th>
+                        <th class="col-num">负</th>
+                        <th class="col-num">进球</th>
+                        <th class="col-num">失球</th>
+                        <th class="col-num col-gd">净胜球</th>
+                        <th class="col-pts">积分</th>
+                        <th class="col-action"></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="icon-large">🏟️</div>
+                <p>还没有球队，快来添加吧！</p>
+                <button class="btn btn-primary" onclick="openAddModal()">+ 添加第一支球队</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" style="display:none;">
+    <div class="modal">
+        <h3 id="modalTitle">添加球队</h3>
+        <div class="form-group">
+            <label>球队名称 <span style="color:#e53935;">*</span></label>
+            <input type="text" id="modalTeamName" placeholder="请输入球队名称" maxlength="30">
+        </div>
+        <div class="form-group">
+            <label>球队队徽</label>
+            <div class="logo-upload-area">
+                <div class="logo-preview" id="modalLogoPreview" onclick="triggerLogoUpload()">
+                    <span id="modalLogoPlaceholder">点击上传</span>
+                    <img id="modalLogoImg" src="" alt="" style="display:none;">
+                </div>
+                <div style="font-size:0.78rem;color:#999;">支持 JPG/PNG/SVG</div>
+            </div>
+            <input type="file" id="modalLogoInput" accept="image/*" style="display:none;" onchange="handleLogoFileSelect(event)">
+        </div>
+        <div class="btn-row">
+            <button class="btn btn-cancel" onclick="closeModal()">取消</button>
+            <button class="btn btn-confirm" onclick="confirmModal()">确认添加</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast" style="display:none;"></div>
+
+<script>
+    (function() {
+        const STORAGE_KEY = 'football_league_v3_manual';
+        let teams = [];
+        let sortTimeout = null;
+
+        const defaultTeams = [
+            { id: generateId(), name: '上海申花', logo: '', played: 12, won: 9, drawn: 2, lost: 1, goalsFor: 28, goalsAgainst: 8, customGD: null },
+            { id: generateId(), name: '上海海港', logo: '', played: 12, won: 8, drawn: 3, lost: 1, goalsFor: 31, goalsAgainst: 12, customGD: null },
+            { id: generateId(), name: '北京国安', logo: '', played: 12, won: 7, drawn: 3, lost: 2, goalsFor: 22, goalsAgainst: 10, customGD: null },
+            { id: generateId(), name: '成都蓉城', logo: '', played: 12, won: 7, drawn: 2, lost: 3, goalsFor: 20, goalsAgainst: 11, customGD: null },
+            { id: generateId(), name: '山东泰山', logo: '', played: 12, won: 6, drawn: 3, lost: 3, goalsFor: 19, goalsAgainst: 13, customGD: null },
+            { id: generateId(), name: '天津津门虎', logo: '', played: 12, won: 5, drawn: 4, lost: 3, goalsFor: 16, goalsAgainst: 14, customGD: null },
+            { id: generateId(), name: '浙江队', logo: '', played: 12, won: 5, drawn: 3, lost: 4, goalsFor: 15, goalsAgainst: 15, customGD: null },
+            { id: generateId(), name: '河南队', logo: '', played: 12, won: 4, drawn: 4, lost: 4, goalsFor: 13, goalsAgainst: 16, customGD: null },
+            { id: generateId(), name: '武汉三镇', logo: '', played: 12, won: 3, drawn: 5, lost: 4, goalsFor: 14, goalsAgainst: 18, customGD: null },
+            { id: generateId(), name: '长春亚泰', logo: '', played: 12, won: 3, drawn: 4, lost: 5, goalsFor: 11, goalsAgainst: 17, customGD: null },
+            { id: generateId(), name: '青岛海牛', logo: '', played: 12, won: 2, drawn: 3, lost: 7, goalsFor: 9, goalsAgainst: 22, customGD: null },
+            { id: generateId(), name: '南通支云', logo: '', played: 12, won: 1, drawn: 2, lost: 9, goalsFor: 7, goalsAgainst: 28, customGD: null }
+        ];
+
+        function generateId() {
+            return 'team_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length) {
+                        teams = parsed.map(t => ({
+                            ...t,
+                            played: t.played ?? (t.won + t.drawn + t.lost),
+                            goalsFor: t.goalsFor ?? 0,
+                            goalsAgainst: t.goalsAgainst ?? 0,
+                            logo: t.logo || '',
+                            customGD: t.customGD ?? null,
+                            id: t.id || generateId()
+                        }));
+                        return;
+                    }
+                }
+            } catch (e) { console.warn('数据加载失败', e); }
+            teams = JSON.parse(JSON.stringify(defaultTeams));
+            saveData();
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(teams));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') showToast('⚠️ 存储空间不足，请清理队徽图片');
+                else console.warn('保存失败', e);
+            }
+        }
+
+        function getGoalDifference(team) {
+            return team.customGD != null ? team.customGD : (team.goalsFor || 0) - (team.goalsAgainst || 0);
+        }
+
+        function getPoints(team) {
+            return (team.won || 0) * 3 + (team.drawn || 0) * 1;
+        }
+
+        function sortTeams(arr) {
+            return arr.sort((a, b) => {
+                const ptsA = getPoints(a), ptsB = getPoints(b);
+                if (ptsB !== ptsA) return ptsB - ptsA;
+                const gdA = getGoalDifference(a), gdB = getGoalDifference(b);
+                if (gdB !== gdA) return gdB - gdA;
+                const gfA = a.goalsFor || 0, gfB = b.goalsFor || 0;
+                if (gfB !== gfA) return gfB - gfA;
+                return (a.name || '').localeCompare(b.name || '', 'zh-CN');
+            });
+        }
+
+        function getSortedTeams() { return sortTeams([...teams]); }
+
+        function getZoneClass(rank, total) {
+            if (total <= 1) return '';
+            if (rank === 1) return 'row-gold';
+            if (total >= 6 && (rank === 2 || rank === 3)) return 'row-blue';
+            if (rank === total) return 'row-red';
+            if (total >= 6 && rank === total - 1) return 'row-orange';
+            return '';
+        }
+
+        function getRankClass(rank, total) {
+            if (total <= 1) return '';
+            if (rank === 1) return 'rank-gold';
+            if (total >= 6 && (rank === 2 || rank === 3)) return 'rank-blue';
+            if (rank === total) return 'rank-red';
+            if (total >= 6 && rank === total - 1) return 'rank-orange';
+            return '';
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            const teamCountEl = document.getElementById('teamCount');
+            const sorted = getSortedTeams();
+            const total = sorted.length;
+            teamCountEl.textContent = total;
+
+            if (total === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            emptyState.style.display = 'none';
+
+            tbody.innerHTML = sorted.map((team, index) => {
+                const rank = index + 1;
+                const gd = getGoalDifference(team);
+                const pts = getPoints(team);
+                const isCustomGD = team.customGD != null;
+                const zoneClass = getZoneClass(rank, total);
+                const rankClass = getRankClass(rank, total);
+                const logoHtml = team.logo
+                    ? `<img src="${escapeHtml(team.logo)}" class="team-logo-img" onclick="triggerTeamLogoUpload('${team.id}')" title="更换队徽">`
+                    : `<div class="team-logo-placeholder" onclick="triggerTeamLogoUpload('${team.id}')" title="上传队徽">+</div>`;
+
+                return `
+                    <tr class="${zoneClass}" data-team-id="${team.id}">
+                        <td class="col-rank ${rankClass}">${rank}</td>
+                        <td class="col-team-cell">
+                            <div class="team-info">
+                                ${logoHtml}
+                                <input type="text" class="team-name-input" value="${escapeHtml(team.name)}" 
+                                       data-team-id="${team.id}" data-field="name"
+                                       onchange="updateTeamField('${team.id}','name',this.value)"
+                                       onblur="updateTeamField('${team.id}','name',this.value)">
+                            </div>
+                        </td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.played || 0}" min="0" max="99" data-team-id="${team.id}" data-field="played" oninput="handleDataInput('${team.id}','played',this.value)" onblur="handleDataBlur('${team.id}','played',this.value)"></td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.won || 0}" min="0" max="99" data-team-id="${team.id}" data-field="won" oninput="handleDataInput('${team.id}','won',this.value)" onblur="handleDataBlur('${team.id}','won',this.value)"></td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.drawn || 0}" min="0" max="99" data-team-id="${team.id}" data-field="drawn" oninput="handleDataInput('${team.id}','drawn',this.value)" onblur="handleDataBlur('${team.id}','drawn',this.value)"></td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.lost || 0}" min="0" max="99" data-team-id="${team.id}" data-field="lost" oninput="handleDataInput('${team.id}','lost',this.value)" onblur="handleDataBlur('${team.id}','lost',this.value)"></td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.goalsFor || 0}" min="0" max="999" data-team-id="${team.id}" data-field="goalsFor" oninput="handleDataInput('${team.id}','goalsFor',this.value)" onblur="handleDataBlur('${team.id}','goalsFor',this.value)"></td>
+                        <td class="col-num"><input type="number" class="data-input" value="${team.goalsAgainst || 0}" min="0" max="999" data-team-id="${team.id}" data-field="goalsAgainst" oninput="handleDataInput('${team.id}','goalsAgainst',this.value)" onblur="handleDataBlur('${team.id}','goalsAgainst',this.value)"></td>
+                        <td class="col-num col-gd">
+                            <input type="number" class="data-input" value="${gd}" style="${isCustomGD ? 'background:#fff8e1;' : ''}" data-team-id="${team.id}" data-field="customGD" oninput="handleDataInput('${team.id}','customGD',this.value)" onblur="handleDataBlur('${team.id}','customGD',this.value)" placeholder="自动">
+                        </td>
+                        <td class="col-pts"><span class="data-input calculated">${pts}</span></td>
+                        <td class="col-action">
+                            <button class="btn-danger-sm delete-btn" onclick="deleteTeam('${team.id}')" title="删除">✕</button>
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function findTeamById(id) { return teams.find(t => t.id === id); }
+
+        function updateTeamField(teamId, field, rawValue) {
+            const team = findTeamById(teamId);
+            if (!team) return;
+            if (field === 'name') {
+                const trimmed = rawValue.trim();
+                if (trimmed && trimmed !== team.name) {
+                    team.name = trimmed;
+                    saveData();
+                    renderTable();
+                } else if (!trimmed) { renderTable(); }
+                return;
+            }
+            if (field === 'customGD') {
+                const val = rawValue.trim();
+                if (val === '' || val === '-') {
+                    team.customGD = null;
+                } else {
+                    const num = parseInt(val, 10);
+                    if (!isNaN(num)) team.customGD = num;
+                }
+                saveData();
+                renderTable();
+                return;
+            }
+            const intVal = parseInt(rawValue, 10);
+            if (!isNaN(intVal) && intVal >= 0) {
+                const maxVal = (field === 'goalsFor' || field === 'goalsAgainst') ? 999 : 99;
+                team[field] = Math.min(intVal, maxVal);
+                saveData();
+                renderTable();
+            } else { renderTable(); }
+        }
+
+        function handleDataInput(teamId, field, rawValue) {
+            const team = findTeamById(teamId);
+            if (!team) return;
+
+            if (field === 'customGD') {
+                const val = rawValue.trim();
+                if (val === '' || val === '-') {
+                    team.customGD = null;
+                } else {
+                    const num = parseInt(val, 10);
+                    if (!isNaN(num)) team.customGD = num;
+                }
+            } else {
+                const intVal = parseInt(rawValue, 10);
+                if (!isNaN(intVal) && intVal >= 0) {
+                    const maxVal = (field === 'goalsFor' || field === 'goalsAgainst') ? 999 : 99;
+                    team[field] = Math.min(intVal, maxVal);
+                }
+            }
+
+            if (sortTimeout) clearTimeout(sortTimeout);
+            sortTimeout = setTimeout(() => {
+                saveData();
+                renderTable();
+            }, 250);
+        }
+
+        function handleDataBlur(teamId, field, rawValue) {
+            if (sortTimeout) clearTimeout(sortTimeout);
+            const team = findTeamById(teamId);
+            if (!team) return;
+
+            if (field === 'customGD') {
+                const val = rawValue.trim();
+                team.customGD = (val === '' || val === '-') ? null : (parseInt(val,10) || 0);
+            } else {
+                const intVal = parseInt(rawValue, 10);
+                if (!isNaN(intVal) && intVal >= 0) {
+                    const maxVal = (field === 'goalsFor' || field === 'goalsAgainst') ? 999 : 99;
+                    team[field] = Math.min(intVal, maxVal);
+                } else { team[field] = team[field] || 0; }
+            }
+            saveData();
+            renderTable();
+        }
+
+        function deleteTeam(teamId) {
+            const team = findTeamById(teamId);
+            if (!team) return;
+            if (!confirm(`确定删除「${team.name}」吗？`)) return;
+            teams = teams.filter(t => t.id !== teamId);
+            saveData();
+            renderTable();
+            showToast('已删除：' + team.name);
+        }
+
+        function resetAllData() {
+            if (!confirm('确定重置为默认数据吗？')) return;
+            teams = JSON.parse(JSON.stringify(defaultTeams));
+            teams.forEach(t => t.id = generateId());
+            saveData();
+            renderTable();
+            showToast('✅ 数据已重置');
+        }
+
+        let pendingLogoTeamId = null;
+        function triggerTeamLogoUpload(teamId) {
+            pendingLogoTeamId = teamId;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) compressAndSetLogo(teamId, file);
+                pendingLogoTeamId = null;
+            };
+            input.click();
+        }
+
+        function compressAndSetLogo(teamId, file) {
+            const reader = new FileReader();
+            const maxSize = 500 * 1024;
+            if (file.size > maxSize) {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = function() {
+                    URL.revokeObjectURL(url);
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 200;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    setTeamLogo(teamId, canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.src = url;
+            } else {
+                reader.onload = function(e) { setTeamLogo(teamId, e.target.result); };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setTeamLogo(teamId, dataUrl) {
+            const team = findTeamById(teamId);
+            if (team) { team.logo = dataUrl; saveData(); renderTable(); showToast('✅ 队徽已更新'); }
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = '添加球队';
+            document.getElementById('modalTeamName').value = '';
+            document.getElementById('modalLogoImg').style.display = 'none';
+            document.getElementById('modalLogoPlaceholder').style.display = 'block';
+            document.getElementById('modalLogoInput').value = '';
+            document.getElementById('modalLogoInput').dataset.tempLogo = '';
+            document.getElementById('modalOverlay').style.display = 'flex';
+            document.getElementById('modalTeamName').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('modalLogoInput').dataset.tempLogo = '';
+        }
+
+        function triggerLogoUpload() { document.getElementById('modalLogoInput').click(); }
+
+        function handleLogoFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            const maxSize = 500 * 1024;
+            if (file.size > maxSize) {
+                const img = new Image();
+                const url = URL.createObjectURL(file);
+                img.onload = function() {
+                    URL.revokeObjectURL(url);
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 200;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
+                    else { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    setModalLogoPreview(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.src = url;
+            } else {
+                reader.onload = function(e) { setModalLogoPreview(e.target.result); };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function setModalLogoPreview(dataUrl) {
+            document.getElementById('modalLogoImg').src = dataUrl;
+            document.getElementById('modalLogoImg').style.display = 'block';
+            document.getElementById('modalLogoPlaceholder').style.display = 'none';
+            document.getElementById('modalLogoInput').dataset.tempLogo = dataUrl;
+        }
+
+        function confirmModal() {
+            const name = document.getElementById('modalTeamName').value.trim();
+            if (!name) { showToast('⚠️ 请输入球队名称'); return; }
+            const tempLogo = document.getElementById('modalLogoInput').dataset.tempLogo || '';
+            teams.push({
+                id: generateId(), name, logo: tempLogo,
+                played: 0, won: 0, drawn: 0, lost: 0,
+                goalsFor: 0, goalsAgainst: 0, customGD: null
+            });
+            saveData();
+            closeModal();
+            renderTable();
+            showToast('✅ 球队「' + name + '」已添加');
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        let toastTimer = null;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if (toastTimer) clearTimeout(toastTimer);
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            toast.style.animation = 'none';
+            toast.offsetHeight;
+            toast.style.animation = 'toastIn 0.3s ease, toastOut 0.3s ease 1.8s forwards';
+            toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2200);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('modalOverlay').style.display === 'flex') closeModal();
+        });
+
+        loadData();
+        renderTable();
+
+        window.openAddModal = openAddModal;
+        window.closeModal = closeModal;
+        window.confirmModal = confirmModal;
+        window.triggerLogoUpload = triggerLogoUpload;
+        window.handleLogoFileSelect = handleLogoFileSelect;
+        window.triggerTeamLogoUpload = triggerTeamLogoUpload;
+        window.updateTeamField = updateTeamField;
+        window.handleDataInput = handleDataInput;
+        window.handleDataBlur = handleDataBlur;
+        window.deleteTeam = deleteTeam;
+        window.resetAllData = resetAllData;
+    })();
+</script>
+</body>
+</html>
